@@ -59,7 +59,7 @@ User runs `/lint`.
 - Instances derived from a template may keep this optional check script; if it does not exist, skip this check silently.
 - Run `python3 -I scripts/check_template_sync.py --no-diff` and report its findings: files only here / only in the template, differing files, probable renames, and personal data in framework files.
 - Exit code 2 (template not reachable, e.g. no network) → report the check as skipped, not as an issue.
-- This check only reports. Syncing follows the procedure in `CLAUDE.md` (branch + pull request, user approval before pushing).
+- This check only reports. Syncing follows the instance's own sync procedure (branch + pull request, user approval before pushing).
 
 ## Output format
 ```
