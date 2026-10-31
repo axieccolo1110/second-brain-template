@@ -50,14 +50,14 @@ A Karpathy-style LLM Wiki for professional knowledge. The LLM synthesizes raw so
 - **Frontmatter**: `type: report`, `title`, `date`, `purpose`, `based_on` (list of wiki pages used, without `.md`).
 - **Snapshots** — reports are not maintained and not listed in `index.md` or `log.md`.
 - **Never ingested** — they derive from the wiki, so ingesting them would be circular.
-- **Language** follows the audience (wiki content stays English).
+- **Language** follows the audience (wiki content follows the source language).
 - New insights that emerge from a report are captured as a separate note in `raw/` and go through `/ingest`.
 
 ## raw/ conventions
 
 - **Flat structure** — all files live directly in `raw/`. No subdirectories required.
 - **No naming convention enforced** — any descriptive filename works. Low friction intake is more important than consistent naming.
-- Files are **immutable once ingested** — never edit or delete a file after its row is in `wiki/log.md`.
+- Files are **immutable once ingested** — never edit or delete a file after its row is in `wiki/log.md`. Enforced by a PreToolUse hook (`scripts/protect_raw.py`, configured in `.claude/settings.json`) for file tools and common shell writes.
 - **Before that**, only LLM-authored notes (from conversations, retros, grilling sessions) may be amended: corrections the user gives during the ingest proposal go straight into the note, not into a new one. External sources (transcripts, articles, mails, PDFs) always stay verbatim; a user correction to them goes into a separate short note.
 - Supported formats: Markdown, meeting notes, PDF transcriptions, article captures, Teams transcripts as `.vtt` or `.docx` (converted to Markdown by `/ingest`; the original stays).
 - **Meeting transcripts**: named `YYYY-MM-DD-meeting-<slug>.md`. The LLM prepends a frontmatter (`type: transcript`, `date`, `participants`, `speakers`, `context`, `completeness`, `language`, `source_original`); the transcript text itself stays verbatim. `source_original` marks the Teams original as converted.
@@ -66,9 +66,22 @@ A Karpathy-style LLM Wiki for professional knowledge. The LLM synthesizes raw so
 
 - **Flat structure** — all pages live directly in `wiki/`.
 - The LLM decides page granularity (when to create new pages vs. extend existing ones).
-- Language: **English** for all wiki content.
+- Language: **follows the source**. Wiki content uses the language of its sources (e.g. a German source yields German pages), and terms stay as written in the source. Existing pages are not translated.
 - Links between pages use `[[page-name]]` format (without `.md` extension).
 - Every wiki page (except `index.md` and `log.md`) must have YAML frontmatter.
+
+## Page layout
+
+The wiki is read primarily by agents (Claude, coding harnesses), secondarily by humans. Pages from reference sources (books, articles, docs, notes) use one fixed layout so an agent finds the same kind of information in the same place:
+
+1. **Summary** — 2–4 sentences: what the concept is and why it matters.
+2. **Core content** — fixed sub-sections with lists and tables rather than prose; pages of the same kind use the same headings (e.g. patterns: when to use, risks, playbook, example flow).
+3. **Apply** — concrete rules or a checklist in the imperative, directly usable by an agent.
+4. **Caveats** — the source's own limitations, uncertain or estimated values, and anything that is the LLM's interpretation rather than the source's statement.
+5. **Source** — where in the source the content comes from (chapter/section numbers, file).
+6. **Related** — `[[wikilinks]]` to neighbouring pages.
+
+Principles: one page per concept (an agent loads only what it needs); terms exactly as in the source and its glossary; no decoration (anecdotes, marketing tone); figure content is transcribed into text, images are not copied. Hub pages may add an overview or map instead of Apply. Meeting knowledge follows the transcript rules in `.claude/commands/ingest.md`.
 
 ## Frontmatter schema
 
@@ -109,7 +122,9 @@ draft ──(user verifies)──→ reviewed
 ```
 
 - New pages always start as `draft`.
-- Only the user sets `reviewed` — the LLM never promotes a page to reviewed on its own.
+- Only the user decides `reviewed` — the LLM never promotes a page on its own. On the user's explicit instruction the LLM sets the field, also in bulk (e.g. "all pages from source X except Y"); the batch is named in the commit message.
+- `reviewed` means: the page is a faithful synthesis of its sources (and correct where the user has own knowledge). It does not mean the user agrees with a source's opinions.
+- Large ingests are reviewed by sampling: the LLM proposes 2–3 representative pages per block plus every page with `confidence: medium` or `low`; if those pass, the user releases the whole block.
 - `outdated` is set automatically by `/ingest` when new raw material updates a `reviewed` page, or set manually when a page's sources are older than 6 months.
 - When an `outdated` page is updated, it returns to `draft` — the new content is unverified.
 
@@ -126,3 +141,4 @@ Ingestion is **semi-automatic**:
 - `/ingest` — Process new raw files into wiki pages; meeting transcripts also get a protocol in `meetings/` (one approval per transcript).
 - `/query` — Ask questions against the wiki, get answers with citations.
 - `/lint` — Check wiki health (broken links, missing index entries, stale pages).
+- `/review` — Review `draft` pages by sampling and set `reviewed` on the blocks the user releases.

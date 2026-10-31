@@ -13,7 +13,7 @@ raw/  ──/ingest──▶  wiki/  ──(on request)──▶  reports/
 | Folder | What lives there |
 |--------|------------------|
 | `raw/` | Source material, immutable once ingested: notes, article captures, PDF transcriptions, Teams transcripts (`.vtt`/`.docx`). Flat, any filename. |
-| `wiki/` | Pages maintained by Claude, in English, with YAML frontmatter. `index.md` is the table of contents, `log.md` records what was ingested. |
+| `wiki/` | Pages maintained by Claude, in the language of their sources, with YAML frontmatter. `index.md` is the table of contents, `log.md` records what was ingested. |
 | `meetings/` | Meeting protocols generated from transcripts, plus `glossary.md` for speech-recognition corrections. |
 | `reports/` | Point-in-time compilations derived from the wiki (talk prep, summaries). Never ingested. |
 | `projects/` | Time-bound work, one subfolder per project with a `project.md` (goal, acceptance criteria, log). |
@@ -40,10 +40,11 @@ All conventions are spelled out in [`CLAUDE.md`](CLAUDE.md), which Claude reads 
 - **`/ingest`** — finds files in `raw/` not yet in `wiki/log.md`, proposes new or updated wiki pages and writes them after your approval. Teams transcripts additionally get a protocol in `meetings/` (one approval per transcript).
 - **`/query`** — answers questions from the wiki with citations.
 - **`/lint`** — checks broken links, missing index entries, stale and outdated pages, report references and project consistency. Read-only.
+- **`/review`** — groups `draft` pages into blocks, proposes 2–3 sample pages per block (plus every `medium`/`low` confidence page) and sets `reviewed` on the blocks you release.
 
 ## Page lifecycle
 
-New pages start as `draft`. Only you set `reviewed`. When new material changes a reviewed page, it becomes `outdated` and returns to `draft` once updated. Each page also carries a `confidence` (`high` / `medium` / `low`).
+New pages start as `draft`. Only you decide `reviewed` — on your instruction Claude sets it, also for whole blocks after you checked a sample (`/review`). `reviewed` means the page faithfully reflects its sources. When new material changes a reviewed page, it becomes `outdated` and returns to `draft` once updated. Each page also carries a `confidence` (`high` / `medium` / `low`).
 
 ## Meeting protocols use German terms
 
@@ -51,13 +52,19 @@ The transcript rules in `.claude/commands/ingest.md` expect some German vocabula
 
 ## Removing the example
 
-The template ships with one example so you can see the result of an ingest. Delete it before you start — this is the one allowed exception to "raw files are immutable":
+The template ships with one example so you can see the result of an ingest. Delete it before you start — this is the one allowed exception to "raw files are immutable". Remove the log row **first**: the raw/ protection hook blocks changes to any file listed in `wiki/log.md`.
 
-1. `raw/example-llm-wiki-pattern.md`
-2. `wiki/llm-wiki-pattern.md`
-3. the `## Example` section in `wiki/index.md`
-4. the example row in `wiki/log.md`
+1. the example row in `wiki/log.md`
+2. `raw/example-llm-wiki-pattern.md`
+3. `wiki/llm-wiki-pattern.md`
+4. the `## Example` section in `wiki/index.md`
 5. the `Cloud Code` example row in `meetings/glossary.md`
+
+Alternatively keep it: the page describes the pattern this vault follows.
+
+## raw/ protection hook
+
+`.claude/settings.json` registers a PreToolUse hook (`scripts/protect_raw.py`, needs `python3`). It blocks Claude from editing, overwriting, moving or deleting a `raw/` file once it is listed in `wiki/log.md` — via file tools and common shell writes (`sed -i`, `>`, `rm`, `mv`, …). Reading and copying from `raw/` stays allowed. It is a guardrail for Claude, not a sandbox; your own edits outside Claude Code are not affected. Review or disable it with `/hooks`.
 
 ## Tips
 

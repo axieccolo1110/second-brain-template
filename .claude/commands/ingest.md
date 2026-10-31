@@ -111,4 +111,4 @@ Protocol only, with `ingest: false`. No topic-page changes. Log row with action 
 - Always use `[[page-name]]` format for cross-references between wiki pages.
 - Set `status: draft` on all new or substantially updated pages.
 - Set `confidence` based on source quality: `high` if authoritative/detailed, `medium` if reasonable but incomplete, `low` if speculative or thin.
-- Write all wiki content in English.
+- Write wiki content in the language of its sources; keep terms as written in the source.

@@ -3,7 +3,7 @@
 .claude/memory/
 .claude/plans/
 .claude/projects/
-.claude/settings.*
+.claude/settings.local.json
 .claude/scheduled_tasks.json
 *.jsonl
 .playwright-mcp/
