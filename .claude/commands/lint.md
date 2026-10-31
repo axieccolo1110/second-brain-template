@@ -55,6 +55,12 @@ User runs `/lint`.
 - **Closed projects without retro**: `done` or `cancelled` projects with no matching retro note in `raw/` (heuristic: a raw file mentioning the project slug or title). Suggest writing one and running `/ingest`.
 - **`related_wiki`**: verify each entry exists as `wiki/<page-name>.md`.
 
+### 8. Template sync (only if `scripts/check_template_sync.py` exists)
+- Instances derived from a template may keep this optional check script; if it does not exist, skip this check silently.
+- Run `python3 -I scripts/check_template_sync.py --no-diff` and report its findings: files only here / only in the template, differing files, probable renames, and personal data in framework files.
+- Exit code 2 (template not reachable, e.g. no network) → report the check as skipped, not as an issue.
+- This check only reports. Syncing follows the procedure in `CLAUDE.md` (branch + pull request, user approval before pushing).
+
 ## Output format
 ```
 ## Wiki Lint Report
@@ -83,8 +89,12 @@ User runs `/lint`.
 - <project> — <issue, e.g. no acceptance criteria / done with open criteria / stale since YYYY-MM-DD>
 ...
 
+### Template Sync
+- <only here | only in template | differing | personal data>: <file> ...
+(omit this section when the check script does not exist)
+
 ### Summary
-X issues found (Y broken links, Z missing from index, ..., N project issues)
+X issues found (Y broken links, Z missing from index, ..., N project issues, M template-sync issues)
 ```
 
 If everything is clean:
