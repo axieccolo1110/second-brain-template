@@ -32,7 +32,7 @@ A Karpathy-style LLM Wiki for professional knowledge. The LLM synthesizes raw so
 - **Changing acceptance criteria** is allowed but must be recorded with date and reason in the log.
 - **Language**: German or English, whatever fits the project or audience.
 - **Not part of the wiki** — projects are never ingested and not listed in `index.md` or `log.md`.
-- **Closing a project**: write a retro note into `raw/` (outcome, learnings, decisions) and run `/ingest`, so durable knowledge reaches the wiki only via `raw/`.
+- **Closing a project**: write a closing note into `raw/` (outcome, learnings, decisions) and run `/ingest`, so durable knowledge reaches the wiki only via `raw/`.
 - Finished projects stay in place; `status` marks them as closed (no archive folder).
 
 ## meetings/ conventions
@@ -58,7 +58,7 @@ A Karpathy-style LLM Wiki for professional knowledge. The LLM synthesizes raw so
 - **Flat structure** — all files live directly in `raw/`. No subdirectories required.
 - **No naming convention enforced** — any descriptive filename works. Low friction intake is more important than consistent naming.
 - Files are **immutable once ingested** — never edit or delete a file after its row is in `wiki/log.md`. Enforced by a PreToolUse hook (`scripts/protect_raw.py`, configured in `.claude/settings.json`) for file tools and common shell writes.
-- **Before that**, only LLM-authored notes (from conversations, retros, grilling sessions) may be amended: corrections the user gives during the ingest proposal go straight into the note, not into a new one. External sources (transcripts, articles, mails, PDFs) always stay verbatim; a user correction to them goes into a separate short note.
+- **Before that**, only LLM-authored notes (from conversations, project closing notes, grilling sessions) may be amended: corrections the user gives during the ingest proposal go straight into the note, not into a new one. External sources (transcripts, articles, mails, PDFs) always stay verbatim; a user correction to them goes into a separate short note.
 - Supported formats: Markdown, meeting notes, PDF transcriptions, article captures, Teams transcripts as `.vtt` or `.docx` (converted to Markdown by `/ingest`; the original stays).
 - **Meeting transcripts**: named `YYYY-MM-DD-meeting-<slug>.md`. The LLM prepends a frontmatter (`type: transcript`, `date`, `participants`, `speakers`, `context`, `completeness`, `language`, `source_original`); the transcript text itself stays verbatim. `source_original` marks the Teams original as converted.
 

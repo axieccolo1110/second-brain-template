@@ -52,7 +52,7 @@ User runs `/lint`.
   - `cancelled` without a reason in the log.
   - `active` with all criteria checked → suggest closing (the user decides).
 - **Stale projects**: `active` projects whose newest log entry (fallback: file modification date) is older than 30 days; `paused` older than 90 days. Suggest resuming, pausing, or cancelling.
-- **Closed projects without retro**: `done` or `cancelled` projects with no matching retro note in `raw/` (heuristic: a raw file mentioning the project slug or title). Suggest writing one and running `/ingest`.
+- **Closed projects without closing note**: `done` or `cancelled` projects with no matching closing note in `raw/` (heuristic: a raw file mentioning the project slug or title). Suggest writing one and running `/ingest`.
 - **`related_wiki`**: verify each entry exists as `wiki/<page-name>.md`.
 
 ### 8. Template sync (only if `scripts/check_template_sync.py` exists)
