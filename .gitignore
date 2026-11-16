@@ -7,3 +7,4 @@
 .claude/scheduled_tasks.json
 *.jsonl
 .playwright-mcp/
+__pycache__/
