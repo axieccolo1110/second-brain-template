@@ -135,10 +135,3 @@ Ingestion is **semi-automatic**:
 2. For each new file, the LLM proposes changes (new wiki pages or updates to existing ones).
 3. The LLM **waits for user confirmation** before writing any wiki changes.
 4. After confirmation: writes/updates wiki pages, updates `index.md`, prepends new rows to `log.md` (below the table header).
-
-## Skills
-
-- `/ingest` — Process new raw files into wiki pages; meeting transcripts also get a protocol in `meetings/` (one approval per transcript).
-- `/query` — Ask questions against the wiki, get answers with citations.
-- `/lint` — Check wiki health (broken links, missing index entries, stale pages).
-- `/review` — Review `draft` pages by sampling and set `reviewed` on the blocks the user releases.
